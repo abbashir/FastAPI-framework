@@ -1,6 +1,8 @@
 from typing import Optional
+
+import aiofiles
 from pydantic import BaseModel
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
@@ -48,3 +50,11 @@ def update_product(product_id: int, product: Product):
 def delete_product(product_id: int):
     fakedb.pop(product_id - 1)
     return {"message": "product deletion successful"}
+
+
+@app.post("/files/")
+async def create_upload_file(uploaded_file: UploadFile = File(...)):
+    file_location = f"D:/DjangoProject/fastAPI/api/{uploaded_file.filename}"
+    with open(file_location, "wb+") as file_object:
+        file_object.write(uploaded_file.file.read())
+    return {"info": f"file '{uploaded_file.filename}' saved at '{file_location}'"}
